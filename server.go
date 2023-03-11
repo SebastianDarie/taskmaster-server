@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +17,8 @@ type Todo struct {
 }
 
 func main() {
-	db, err := gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
+	dsn := "root:Svyyz0XRxNsdvdvTm1gF@tcp(containers-us-west-157.railway.app:7218)/railway"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -32,7 +33,7 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	
+
 	e.GET("/todos", func(c echo.Context) error {
 		todos := []Todo{}
 		db.Find(&todos)
