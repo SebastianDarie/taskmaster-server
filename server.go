@@ -11,9 +11,12 @@ import (
 
 type Todo struct {
 	gorm.Model
-	Title     string `json:"title" gorm:"not null"`
-	Completed int    `json:"completed"`
+	Title       string `json:"title" gorm:"not null"`
+	Completed   int    `json:"completed"`
 	Description string `json:"description"`
+	DueDate     string `json:"dueDate"`
+	Priority    int    `json:"priority"`
+	Reminder    string `json:"reminder"`
 }
 
 func main() {
@@ -25,12 +28,12 @@ func main() {
 
 	db.AutoMigrate(&Todo{})
 
-	e := echo.New();
+	e := echo.New()
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	  }))
+	}))
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
@@ -61,6 +64,9 @@ func main() {
 			"title":       todo.Title,
 			"completed":   todo.Completed,
 			"description": todo.Description,
+			"due_date":    todo.DueDate,
+			"priority":    todo.Priority,
+			"reminder":    todo.Reminder,
 		})
 		return c.JSON(http.StatusOK, todo)
 	})
