@@ -11,13 +11,13 @@ import (
 
 type Todo struct {
 	gorm.Model
-	Title     string `json:"title"`
+	Title     string `json:"title" gorm:"not null"`
 	Completed int    `json:"completed"`
 	Description string `json:"description"`
 }
 
 func main() {
-	dsn := "root:Svyyz0XRxNsdvdvTm1gF@tcp(containers-us-west-157.railway.app:7218)/railway"
+	dsn := "root:Svyyz0XRxNsdvdvTm1gF@tcp(containers-us-west-157.railway.app:7218)/railway?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
@@ -57,7 +57,11 @@ func main() {
 		if err := c.Bind(todo); err != nil {
 			return err
 		}
-		db.Model(&todo).Where("id = ?", id).Updates(Todo{Title: todo.Title, Completed: todo.Completed, Description: todo.Description})
+		db.Model(&todo).Where("id = ?", id).UpdateColumns(map[string]interface{}{
+			"title":       todo.Title,
+			"completed":   todo.Completed,
+			"description": todo.Description,
+		})
 		return c.JSON(http.StatusOK, todo)
 	})
 	e.DELETE("/todos/:id", func(c echo.Context) error {
